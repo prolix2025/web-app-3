@@ -1,26 +1,4 @@
 // static/app.js
-// put this near the top of app.js
-async function readJsonOrThrow(res) {
-  const ct = res.headers.get("content-type") || "";
-  const bodyText = await res.text(); // read once
-  if (ct.includes("application/json")) {
-    const data = JSON.parse(bodyText || "{}");
-    if (!res.ok) {
-      // standardized error shape from backend: { error: "..."}
-      const msg = data?.error || res.statusText || "Request failed";
-      throw new Error(msg);
-    }
-    return data;
-  }
-  // Not JSON (probably HTML error page). Throw with a readable snippet.
-  if (!res.ok) {
-    const snippet = bodyText?.slice(0, 500) || res.statusText || "Request failed";
-    throw new Error(snippet);
-  }
-  // It was OK but not JSON (unexpected) — try JSON anyway then return text
-  try { return JSON.parse(bodyText); } catch { return { raw: bodyText }; }
-}
-
 
 // ===== Clock (nice-to-have UI detail) =====
 const clockEl = document.getElementById("clock");
