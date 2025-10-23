@@ -13,61 +13,86 @@
       <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Company logo" />
       <h1>Invoice Extractor</h1>
     </div>
-    <div><span class="chip">AI ready <span class="chip-dot"></span></span></div>
-    <div class="clock" id="clock">--:--</div>
+    <div class="right">
+      <span class="chip">AI ready <span class="chip-dot"></span></span>
+      <span id="clock" class="clock"></span>
+    </div>
   </header>
 
-  <main class="shell">
-    <aside class="panel left">
-      <div class="control-title">control panel</div>
-      <button class="btn" id="btn1">Extract with AI</button>
-      <button class="btn secondary" id="btn2">Clear</button>
-      <p class="note">Use these to plug any helper actions (e.g., reset form, re-run extraction, sample invoice).</p>
-    </aside>
+  <main class="wrap">
+    <section class="layout">
+      <!-- Left: Upload & Preview -->
+      <div class="panel">
+        <h2 class="panel-title">Upload</h2>
 
-    <section class="panel center">
-      <div id="dropzone" class="dropzone" tabindex="0" aria-label="Invoice drop zone">
-        <div id="placeholder" class="placeholder">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 16V4m0 0 3.5 3.5M12 4 8.5 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <rect x="3" y="12" width="18" height="8" rx="2" stroke="currentColor" stroke-width="1.6"/>
-          </svg>
-          <h2>Document Preview (pdf, png, jpg)</h2>
-          <p>Drag & drop an invoice here, or <label for="file" class="browse">browse</label></p>
-        </div>
-        <input id="file" type="file" accept="application/pdf,image/png,image/jpeg" hidden />
-        <div id="preview" class="preview-wrap">
-          <div class="preview-area">
-            <img id="imgPreview" alt="Preview" />
-            <embed id="pdfPreview" type="application/pdf" />
+        <div id="dropzone" class="dropzone" aria-label="Dropzone">
+          <input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg" hidden />
+          <div class="dropzone-inner">
+            <div class="drop-icon">⬆️</div>
+            <div>Drop a PDF/JPG/PNG here or click to choose a file</div>
           </div>
         </div>
+
+        <div id="preview" class="preview"></div>
+
+        <div class="actions">
+          <button id="btnExtract" class="btn">Extract</button>
+          <button id="btn2" class="btn btn-secondary" type="button">Clear</button>
+        </div>
+      </div>
+
+      <!-- Right: Fields -->
+      <div class="panel">
+        <h2 class="panel-title">Details</h2>
+
+        <form id="form" class="form" autocomplete="off">
+          <div class="field">
+            <label for="supplier">Supplier</label>
+            <input id="supplier" name="supplier" type="text" placeholder="e.g. ACME BV" />
+          </div>
+
+          <div class="field">
+            <label for="invoice_date">Invoice date</label>
+            <input id="invoice_date" name="invoice_date" type="text" placeholder="YYYY-MM-DD or locale date" />
+          </div>
+
+          <div class="field">
+            <label for="invoice_amount">Invoice amount</label>
+            <input id="invoice_amount" name="invoice_amount" type="text" placeholder="e.g. 1234.56" inputmode="decimal" />
+          </div>
+
+          <div class="field">
+            <label for="btw_amount">BTW amount</label>
+            <input id="btw_amount" name="btw_amount" type="text" placeholder="e.g. 259.26" inputmode="decimal" />
+          </div>
+
+          <div class="field">
+            <label for="btw_number">BTW/VAT number</label>
+            <input id="btw_number" name="btw_number" type="text" placeholder="e.g. NL123456789B01" />
+          </div>
+
+          <div class="field">
+            <label for="kvk">KVK</label>
+            <input id="kvk" name="kvk" type="text" placeholder="8-digit KVK" inputmode="numeric" />
+          </div>
+
+          <div class="field field-textarea">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="4" placeholder="Anything helpful for extraction or bookkeeping…"></textarea>
+          </div>
+
+          <div class="actions">
+            <button id="btnSave" class="btn save-btn" type="button">Save</button>
+            <!-- Enter submits to Save (handled in app.js) -->
+            <button class="btn btn-secondary" type="submit">Submit</button>
+          </div>
+        </form>
       </div>
     </section>
 
-    <aside class="panel right">
-      <form id="detailsForm" autocomplete="on">
-        <div class="field"><label for="invoice_date">invoice date</label><input type="date" id="invoice_date" name="invoice_date" placeholder="dd-mm-jjjj" /></div>
-        <div class="field"><label for="invoice_amount">invoice amount</label><input type="number" step="0.01" id="invoice_amount" name="invoice_amount" placeholder="0.00" /></div>
-        <div class="field"><label for="btw_amount">btw amount</label><input type="number" step="0.01" id="btw_amount" name="btw_amount" placeholder="0.00" /></div>
-        <div class="field"><label for="btw_number">btw number</label><input type="text" id="btw_number" name="btw_number" placeholder="NL999999999B99" /></div>
-        <div class="field"><label for="kvk">kvk nummer</label><input type="text" id="kvk" name="kvk" placeholder="12345678" /></div>
-        <div class="field"><label for="supplier">supplier</label><input type="text" id="supplier" name="supplier" placeholder="Company BV" /></div>
-        <div class="field"><label for="notes">notes</label><textarea id="notes" name="notes" rows="2" placeholder="Anything the AI should know…"></textarea></div>
-        <div class="actions">
-          <button type="button" class="btn secondary" id="saveDraft">Save draft</button>
-          <button type="submit" class="save-btn">save</button>
-        </div>
-      </form>
-    </aside>
+    <p class="credit">Built with Flask • Azure Document Intelligence for extraction</p>
   </main>
 
-  <footer class="bar bottombar">
-    <div class="brand credit"><span>Pravesh Parbhoe</span></div>
-    <div></div>
-    <div></div>
-  </footer>
-
-  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
