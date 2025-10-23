@@ -200,8 +200,8 @@ if (extractBtn) {
     const done = setBusy(extractBtn, "Extracting…");
     try {
       const res = await fetch("/extract", { method: "POST", body: fd });
-      const data = await readJsonOrThrow(res);
-
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || res.statusText);
 
       populateFields(data);
 
@@ -223,13 +223,15 @@ if (saveBtn) {
 
     const done = setBusy(saveBtn, "Saving…");
     try {
-          const res = await fetch("/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          const data = await readJsonOrThrow(res);
-          alert("Saved! Record ID: " + data.id);
+      const res = await fetch("/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || res.statusText);
+
+      toast("Saved! Record ID: " + data.id);
     } catch (err) {
       console.error(err);
       toast("Save failed: " + (err?.message || "Unknown error"));
