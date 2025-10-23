@@ -103,6 +103,22 @@ def save():
         ))
         new_id = cur.lastrowid
     return jsonify({"ok": True, "id": new_id}), 201
+
+# app.py
+from werkzeug.exceptions import HTTPException
+from flask import jsonify, request
+
+@app.errorhandler(Exception)
+def json_error_handler(e):
+    code = 500
+    if isinstance(e, HTTPException):
+        code = e.code or 500
+    # For API endpoints, return JSON; otherwise let Flask render HTML
+    if request.path.startswith("/extract") or request.path.startswith("/save") or request.path.startswith("/invoices"):
+        return jsonify({"error": str(e)}), code
+    # For non-API routes, show the normal error page
+    return e
+
     
 if __name__ == "__main__":
     # Local dev: python app.py
